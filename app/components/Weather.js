@@ -1,17 +1,5 @@
 import React from 'react'
 
-class Results extends React.Component {
-	render() {
-		return (
-			<div>
-				<p>Location: </p>
-				<p>Temperature: </p>
-				<p>Weather Conditions: </p>
-			</div>
-		)
-	}
-
-}
 
 export default class Weather extends React.Component {
 	constructor(props) {
