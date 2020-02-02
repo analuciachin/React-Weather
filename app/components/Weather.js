@@ -99,7 +99,7 @@ export default class Weather extends React.Component {
 							type='text'
 							id='country'
 							className='input-light form-inputs'
-							placeholder='country'
+							placeholder='country code'
 							autoComplete='off'
 							value={country}
 							onChange={this.handleChangeCountry}
