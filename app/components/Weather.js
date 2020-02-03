@@ -23,6 +23,7 @@ export default class Weather extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleChangeCity = this.handleChangeCity.bind(this)
 		this.handleChangeCountry = this.handleChangeCountry.bind(this)
+		this.handleError = this.handleError.bind(this)
 	}
 
 	handleSubmit(event) {
@@ -58,7 +59,9 @@ export default class Weather extends React.Component {
 				console.warn('Error fetching weather info: ', error)
 
 				this.setState ({
-					error: `There was an error fetching the weather info.`
+					error: `There was an error fetching the weather info.`,
+					city:'',
+					country:''
 				})
 			})
 	}
@@ -73,6 +76,12 @@ export default class Weather extends React.Component {
 		this.setState({
 			country:event.target.value
 		})
+	}
+
+	handleError() {
+		if (this.state.error) {
+			return <p className='error'>{ this.state.error }</p>
+		}
 	}
 
 
@@ -129,9 +138,8 @@ export default class Weather extends React.Component {
 					</div>
 				}
 
-				{ error && 
-					<p className='error'>{ error }</p>
-				}
+				{ this.handleError() }
+
         {/*<pre>{JSON.stringify(this.state.weatherData, null, 2)}</pre>*/}
 			
 			</React.Fragment>
