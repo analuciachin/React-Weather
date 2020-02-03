@@ -61,7 +61,8 @@ export default class Weather extends React.Component {
 				this.setState ({
 					error: `There was an error fetching the weather info.`,
 					city:'',
-					country:''
+					country:'',
+					results:false
 				})
 			})
 	}
