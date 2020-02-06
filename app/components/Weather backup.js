@@ -1,17 +1,5 @@
 import React from 'react'
 
-class Results extends React.Component {
-	render() {
-		return (
-			<div>
-				<p>Location: </p>
-				<p>Temperature: </p>
-				<p>Weather Conditions: </p>
-			</div>
-		)
-	}
-
-}
 
 export default class Weather extends React.Component {
 	constructor(props) {
@@ -35,6 +23,7 @@ export default class Weather extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleChangeCity = this.handleChangeCity.bind(this)
 		this.handleChangeCountry = this.handleChangeCountry.bind(this)
+		this.handleError = this.handleError.bind(this)
 	}
 
 	handleSubmit(event) {
@@ -70,7 +59,10 @@ export default class Weather extends React.Component {
 				console.warn('Error fetching weather info: ', error)
 
 				this.setState ({
-					error: `There was an error fetching the weather info.`
+					error: `There was an error fetching the weather info.`,
+					city:'',
+					country:'',
+					results:false
 				})
 			})
 	}
@@ -85,6 +77,12 @@ export default class Weather extends React.Component {
 		this.setState({
 			country:event.target.value
 		})
+	}
+
+	handleError() {
+		if (this.state.error) {
+			return <p className='error'>{ this.state.error }</p>
+		}
 	}
 
 
@@ -111,7 +109,7 @@ export default class Weather extends React.Component {
 							type='text'
 							id='country'
 							className='input-light form-inputs'
-							placeholder='country'
+							placeholder='country code'
 							autoComplete='off'
 							value={country}
 							onChange={this.handleChangeCountry}
@@ -123,7 +121,7 @@ export default class Weather extends React.Component {
 						>
 							Get Weather
 						</button>
-					</div>kldwvbclqekwnd;wvjndo;n;ndfjklvmnl;sznf[ owe]
+					</div>
 				</form>
 
 				{ results &&
@@ -141,10 +139,9 @@ export default class Weather extends React.Component {
 					</div>
 				}
 
-				{ error && 
-					<p className='error'>{ error }</p>
-				}
-        <pre>{JSON.stringify(this.state.weatherData, null, 2)}</pre>
+				{ this.handleError() }
+
+        {/*<pre>{JSON.stringify(this.state.weatherData, null, 2)}</pre>*/}
 			
 			</React.Fragment>
 		)
