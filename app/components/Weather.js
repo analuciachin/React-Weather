@@ -96,6 +96,53 @@ class LocationInput extends React.Component {
 	}
 }
 
+class Forecast extends React.Component {
+
+	constructor(props) {
+		super(props)
+
+		this.state ={
+			weatherForecast: null,
+			error: null,
+			forecast_icon: null,
+			forecast_temp: null,
+			forecast_temp_min: null,
+			forecast_temp_max:null
+		}
+	}
+
+	componentDidMount() {
+		const API_KEY='c0e069a1e1238bcf2a556cf63b14a967'
+		const endpoint = window.encodeURI(`http://api.openweathermap.org/data/2.5/forecast?id=${this.props.city_id}&appid=${API_KEY}`)
+
+		fetch(endpoint)
+			.then(response => {
+				if(!response.ok) {
+					throw new Error();
+				}
+				return response.json();
+			})
+			.then((data) => this.setState({ 
+				weatherForecast: data,
+				error: null
+			}))			
+			.catch((error) => {
+				console.warn('Error fetching weather info: ', error)
+
+				this.setState ({
+					error: `There was an error fetching the weather info.`
+				})
+			})
+		}
+
+		render() {
+			return(
+				<pre>{JSON.stringify(this.state.weatherForecast, null, 2)}</pre>
+			)
+		}
+
+}
+
 
 export default class Weather extends React.Component {
 
@@ -169,7 +216,7 @@ export default class Weather extends React.Component {
 		//onSubmit={(city, country) => console.log(city, country)}
 		//onSubmit={(city, country) => this.handleSubmit(city, country)}
 
-		const { results, res_icon, res_weather, res_city, res_country, res_temp, res_temp_min, res_temp_max} = this.state
+		const { results, res_icon, res_weather, res_city, res_country, res_temp, res_temp_min, res_temp_max, res_city_id} = this.state
 
 		return (
 			<React.Fragment>
@@ -188,6 +235,10 @@ export default class Weather extends React.Component {
 						temp_min={(res_temp_min - 273.15).toFixed(0)}
 						temp_max={(res_temp_max - 273.15).toFixed(0)}
 					/>
+				}
+
+				{ results &&
+					<Forecast city_id={res_city_id}/>
 				}
 
 				{ this.handleError() }
