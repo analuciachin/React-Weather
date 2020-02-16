@@ -4,15 +4,16 @@ import React from 'react'
 function Result({ icon, weather, city, country, temp, temp_min, temp_max }) {
 	return (
 		<div className='weather-result'>
+			<h2>Current Weather</h2>
 			<img className='weather-icon'
 				src={`http://openweathermap.org/img/wn/${icon}@2x.png`} 
 				alt={`${weather} icon`}
 			/>
 			<p><label className='label-color'>Location:</label> {city} , {country}</p>
 			<p><label className='label-color'>Weather Conditions:</label> {weather}</p>
-			<p><label className='label-color'>Temperature:</label> {temp}</p>
-			<p><label className='label-color'>Min Temperature:</label> {temp_min}</p>
-			<p><label className='label-color'>Max Temperature:</label> {temp_max}</p>
+			<p><label className='label-color'>Temperature:</label> {temp}°C</p>
+			<p><label className='label-color'>Min Temperature:</label> {temp_min}°C</p>
+			<p><label className='label-color'>Max Temperature:</label> {temp_max}°C</p>
 		</div>
 	)
 }
@@ -111,7 +112,8 @@ export default class Weather extends React.Component {
 			res_temp: null,
 			res_temp_min: null,
 			res_temp_max: null,
-			res_icon: null
+			res_icon: null,
+			res_city_id: null
 		}
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleError = this.handleError.bind(this)
@@ -140,7 +142,8 @@ export default class Weather extends React.Component {
 				res_icon: data.weather[0].icon,
 				res_temp: data.main.temp,
 				res_temp_min: data.main.temp_min,
-				res_temp_max: data.main.temp_max
+				res_temp_max: data.main.temp_max,
+				res_city_id:data.id
 			}))			
 			.catch((error) => {
 				console.warn('Error fetching weather info: ', error)
@@ -181,9 +184,9 @@ export default class Weather extends React.Component {
 						weather={res_weather}
 						city={res_city}
 						country={res_country}
-						temp={res_temp}
-						temp_min={res_temp_min}
-						temp_max={res_temp_max}
+						temp={(res_temp - 273.15).toFixed(0)}
+						temp_min={(res_temp_min - 273.15).toFixed(0)}
+						temp_max={(res_temp_max - 273.15).toFixed(0)}
 					/>
 				}
 
