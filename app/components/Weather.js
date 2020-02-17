@@ -102,12 +102,8 @@ class Forecast extends React.Component {
 		super(props)
 
 		this.state ={
-			weatherForecast: null,
-			error: null,
-			forecast_icon: null,
-			forecast_temp: null,
-			forecast_temp_min: null,
-			forecast_temp_max:null
+			forecasts: [],
+			error: null
 		}
 	}
 
@@ -123,24 +119,51 @@ class Forecast extends React.Component {
 				return response.json();
 			})
 			.then((data) => this.setState({ 
-				weatherForecast: data,
+				forecasts: data.list,
 				error: null
-			}))			
+			}))
 			.catch((error) => {
-				console.warn('Error fetching weather info: ', error)
+				console.warn('Error fetching weather forecast info: ', error)
 
 				this.setState ({
-					error: `There was an error fetching the weather info.`
+					error: `There was an error fetching the weather forecast info.`
 				})
 			})
 		}
 
 		render() {
 			return(
-				<pre>{JSON.stringify(this.state.weatherForecast, null, 2)}</pre>
+				<div>
+					{/*<pre>{JSON.stringify(this.state.forecasts, null, 2)}</pre>*/}
+					<ForecastGrid weatherForecasts={this.state.forecasts} />
+				</div>
 			)
 		}
+}
 
+function ForecastGrid({ weatherForecasts }) {
+	return(
+		<ul>
+			{weatherForecasts.map((forecast) => {
+				const { main, weather, dt_txt} = forecast
+				const { temp, temp_min, temp_max } = main
+				const { main: weather_main, icon } = weather[0]
+				return (
+					<li key={dt_txt}>
+						<img className='weather-icon'
+							src={`http://openweathermap.org/img/wn/${icon}@2x.png`} 
+							alt={`${weather_main} icon`}
+						/>
+						<p><label className='label-color'>Date:</label> {dt_txt}</p>
+						<p><label className='label-color'>Weather Conditions:</label> {weather_main}</p>
+						<p><label className='label-color'>Temperature:</label> {(temp - 273.15).toFixed(0)}°C</p>
+						<p><label className='label-color'>Min Temperature:</label> {(temp_min - 273.15).toFixed(0)}°C</p>
+						<p><label className='label-color'>Max Temperature:</label> {(temp_max - 273.15).toFixed(0)}°C</p>
+					</li>
+				)
+			})}
+		</ul>
+	)
 }
 
 
