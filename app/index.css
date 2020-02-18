@@ -128,3 +128,24 @@ li {
 .space-around {
 	justify-content: space-around;
 }
+
+.flex-center {
+	display: flex;
+	justify-content: left;
+	align-items: center;
+}
+
+.btn-clear {
+	border: none;
+	background: transparent;
+}
+
+.forecast-section {
+	margin: 100px auto;
+}
+.nav-link {
+	font-size: 18px;
+	font-weight: bold;
+	text-decoration: none;
+	color: inherit;
+}

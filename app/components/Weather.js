@@ -21,7 +21,7 @@ function DegreeTypeNav({ selected, onUpdateDegreeType }) {
 }	
 
 
-function Result({ icon, weather, city, country, temp, temp_min, temp_max }) {
+function Result({ degreeType, icon, weather, city, country, temp, temp_min, temp_max }) {
 	return (
 		<div className='weather-result'>
 			<h2 className='current-title center-text'>Current Weather</h2>
@@ -30,9 +30,15 @@ function Result({ icon, weather, city, country, temp, temp_min, temp_max }) {
 				src={`http://openweathermap.org/img/wn/${icon}@2x.png`} 
 				alt={`${weather} icon`}
 			/>
-			<p className='current-main-info center-text'>{temp}°C</p>
+			{ degreeType === 'Celsius'
+				? <p className='current-main-info center-text'>{temp}°C</p>
+				: <p className='current-main-info center-text'>{temp}°F</p>
+			}
 			<p className='current-detail-info center-text'> {weather}</p>
-			<p className='current-detail-info center-text'>{temp_min}°C / {temp_max}°C</p>
+			{ degreeType === 'Celsius'
+				? <p className='current-detail-info center-text'>{temp_min}°C / {temp_max}°C</p>
+				: <p className='current-detail-info center-text'>{temp_min}°F / {temp_max}°F</p>
+			}
 		</div>
 	)
 }
@@ -166,7 +172,7 @@ class Forecast extends React.Component {
 			return(
 				<div>
 					{/*<p>{this.state.dailyData.length}</p>*/}
-					<pre>{JSON.stringify(this.state.dailyData, null, 2)}</pre>
+					{/*<pre>{JSON.stringify(this.state.dailyData, null, 2)}</pre>*/}
 					<ForecastGrid weatherForecasts={this.state.dailyData} />
 				</div>
 			)
@@ -175,7 +181,7 @@ class Forecast extends React.Component {
 
 function ForecastGrid({ weatherForecasts }) {
 	return(
-		<div>
+		<div className='forecast-section'>
 			<h2>Forecast - 5 days</h2>
 			<ul className='grid space-around'>
 				{weatherForecasts.map((forecast) => {
@@ -206,6 +212,7 @@ export default class Weather extends React.Component {
 		super(props)
 
 		this.state = {
+			selectedDegreeType: 'Celsius',
 			weatherData: null,
 			error: null,
 			results: false,
@@ -220,6 +227,7 @@ export default class Weather extends React.Component {
 		}
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleError = this.handleError.bind(this)
+		this.updateDegreeType = this.updateDegreeType.bind(this)
 	}
 
 	handleSubmit(city, country) {
@@ -243,9 +251,9 @@ export default class Weather extends React.Component {
 				res_country: data.sys.country,
 				res_weather: data.weather[0].description,
 				res_icon: data.weather[0].icon,
-				res_temp: data.main.temp,
-				res_temp_min: data.main.temp_min,
-				res_temp_max: data.main.temp_max,
+				res_temp: data.main.temp - 273.15,
+				res_temp_min: data.main.temp_min - 273.15,
+				res_temp_max: data.main.temp_max - 273.15 ,
 				res_city_id:data.id
 			}))			
 			.catch((error) => {
@@ -267,12 +275,35 @@ export default class Weather extends React.Component {
 		}
 	}
 
+
+	updateDegreeType(selectedDegreeType) {
+		if(this.state.selectedDegreeType === 'Celsius') {
+			//console.log(this.state.selectedDegreeType)
+			this.setState(({ res_temp, res_temp_min, res_temp_max }) => ({
+				selectedDegreeType,
+				res_temp: (res_temp * 9/5) + 32,
+				res_temp_min: (res_temp_min) * 9/5 + 32,
+				res_temp_max: (res_temp_max) * 9/5 + 32,
+			})
+		)}
+		else {
+			//console.log(this.state.selectedDegreeType)
+			this.setState(({ res_temp, res_temp_min, res_temp_max }) => ({
+				selectedDegreeType,
+				res_temp: (res_temp - 32) * 5/9,
+				res_temp_min: (res_temp_min - 32) * 5/9,
+				res_temp_max: (res_temp_max - 32) * 5/9,
+			})
+		)}
+	}
+
+
 	render() {
 		//console.log(this.props)
 		//onSubmit={(city, country) => console.log(city, country)}
 		//onSubmit={(city, country) => this.handleSubmit(city, country)}
 
-		const { results, res_icon, res_weather, res_city, res_country, res_temp, res_temp_min, res_temp_max, res_city_id} = this.state
+		const { selectedDegreeType, results, res_icon, res_weather, res_city, res_country, res_temp, res_temp_min, res_temp_max, res_city_id} = this.state
 
 		return (
 			<React.Fragment>
@@ -280,17 +311,23 @@ export default class Weather extends React.Component {
 				<LocationInput
 					onSubmit={(city, country) => this.handleSubmit(city, country)}
 				/>
-
+				{ results &&
+					<DegreeTypeNav 
+						selected={selectedDegreeType} 
+						onUpdateDegreeType={this.updateDegreeType}
+					/>
+				}
 
 				{ results &&
-					<Result 
+					<Result
+						degreeType={selectedDegreeType}
 						icon={res_icon}
 						weather={res_weather}
 						city={res_city}
 						country={res_country}
-						temp={(res_temp - 273.15).toFixed(0)}
-						temp_min={(res_temp_min - 273.15).toFixed(0)}
-						temp_max={(res_temp_max - 273.15).toFixed(0)}
+						temp={res_temp.toFixed(0)}
+						temp_min={res_temp_min.toFixed(0)}
+						temp_max={res_temp_max.toFixed(0)}
 					/>
 				}
 
