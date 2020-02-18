@@ -1,19 +1,38 @@
 import React from 'react'
 
 
+function DegreeTypeNav({ selected, onUpdateDegreeType }) {
+	const degreeTypes = ['Celsius', 'Fahrenheit']
+
+	return(
+		<ul className='flex-center'>
+			{degreeTypes.map((degreeType) => (
+				<li key={degreeType}>
+					<button 
+						className='btn-clear nav-link'
+						style={degreeType === selected ? { color: 'rgb(187,46,31)' } : null }
+						onClick={() => onUpdateDegreeType(degreeType)}>
+						{degreeType}
+					</button>
+				</li>
+			))}
+		</ul>
+	)
+}	
+
+
 function Result({ icon, weather, city, country, temp, temp_min, temp_max }) {
 	return (
 		<div className='weather-result'>
-			<h2>Current Weather</h2>
-			<img className='weather-icon'
+			<h2 className='current-title center-text'>Current Weather</h2>
+			<p className='current-main-info center-text'>{city} , {country}</p>
+			<img className='current-weather-icon'
 				src={`http://openweathermap.org/img/wn/${icon}@2x.png`} 
 				alt={`${weather} icon`}
 			/>
-			<p><label className='label-color'>Location:</label> {city} , {country}</p>
-			<p><label className='label-color'>Weather Conditions:</label> {weather}</p>
-			<p><label className='label-color'>Temperature:</label> {temp}°C</p>
-			<p><label className='label-color'>Min Temperature:</label> {temp_min}°C</p>
-			<p><label className='label-color'>Max Temperature:</label> {temp_max}°C</p>
+			<p className='current-main-info center-text'>{temp}°C</p>
+			<p className='current-detail-info center-text'> {weather}</p>
+			<p className='current-detail-info center-text'>{temp_min}°C / {temp_max}°C</p>
 		</div>
 	)
 }
@@ -102,9 +121,12 @@ class Forecast extends React.Component {
 		super(props)
 
 		this.state ={
-			forecasts: [],
+			fullData: [],
+			dailyData: [],
 			error: null
 		}
+
+		this.getDayOfWeek = this.getDayOfWeek.bind(this)
 	}
 
 	componentDidMount() {
@@ -119,7 +141,8 @@ class Forecast extends React.Component {
 				return response.json();
 			})
 			.then((data) => this.setState({ 
-				forecasts: data.list,
+				fullData: data.list,
+				dailyData: data.list.filter(reading => reading.dt_txt.includes("18:00:00")),
 				error: null
 			}))
 			.catch((error) => {
@@ -131,11 +154,20 @@ class Forecast extends React.Component {
 			})
 		}
 
+
+		getDayOfWeek(unixTimestamp) {
+			const dayWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+			let dayNum = new Date(unixTimestamp * 1000).getDay()
+			let result = dayWeek[dayNum]
+			return result
+		}
+
 		render() {
 			return(
 				<div>
-					{/*<pre>{JSON.stringify(this.state.forecasts, null, 2)}</pre>*/}
-					<ForecastGrid weatherForecasts={this.state.forecasts} />
+					{/*<p>{this.state.dailyData.length}</p>*/}
+					<pre>{JSON.stringify(this.state.dailyData, null, 2)}</pre>
+					<ForecastGrid weatherForecasts={this.state.dailyData} />
 				</div>
 			)
 		}
@@ -143,26 +175,27 @@ class Forecast extends React.Component {
 
 function ForecastGrid({ weatherForecasts }) {
 	return(
-		<ul>
-			{weatherForecasts.map((forecast) => {
-				const { main, weather, dt_txt} = forecast
-				const { temp, temp_min, temp_max } = main
-				const { main: weather_main, icon } = weather[0]
-				return (
-					<li key={dt_txt}>
-						<img className='weather-icon'
-							src={`http://openweathermap.org/img/wn/${icon}@2x.png`} 
-							alt={`${weather_main} icon`}
-						/>
-						<p><label className='label-color'>Date:</label> {dt_txt}</p>
-						<p><label className='label-color'>Weather Conditions:</label> {weather_main}</p>
-						<p><label className='label-color'>Temperature:</label> {(temp - 273.15).toFixed(0)}°C</p>
-						<p><label className='label-color'>Min Temperature:</label> {(temp_min - 273.15).toFixed(0)}°C</p>
-						<p><label className='label-color'>Max Temperature:</label> {(temp_max - 273.15).toFixed(0)}°C</p>
-					</li>
-				)
-			})}
-		</ul>
+		<div>
+			<h2>Forecast - 5 days</h2>
+			<ul className='grid space-around'>
+				{weatherForecasts.map((forecast) => {
+					const { main, weather, dt_txt, dt} = forecast
+					const { temp, temp_min, temp_max } = main
+					const { description, icon } = weather[0]
+					return (
+						<li key={dt_txt}>
+							<p className='center-text'>{dt_txt}</p>
+							<img className='forecast-weather-icon'
+								src={`http://openweathermap.org/img/wn/${icon}@2x.png`} 
+								alt={`${description} icon`}
+							/>
+							<p className='center-text forecast-temp'>{(temp - 273.15).toFixed(0)}°C</p>
+							<p className='center-text'>{description}</p>
+						</li>
+					)
+				})}
+			</ul>
+		</div>
 	)
 }
 
@@ -208,7 +241,7 @@ export default class Weather extends React.Component {
 				results: true,
 				res_city: data.name,
 				res_country: data.sys.country,
-				res_weather: data.weather[0].main,
+				res_weather: data.weather[0].description,
 				res_icon: data.weather[0].icon,
 				res_temp: data.main.temp,
 				res_temp_min: data.main.temp_min,
@@ -243,10 +276,11 @@ export default class Weather extends React.Component {
 
 		return (
 			<React.Fragment>
-				<h1 className='title'>Weather Finder</h1>
+				<h1 className='title center-text'>Weather Finder</h1>
 				<LocationInput
 					onSubmit={(city, country) => this.handleSubmit(city, country)}
 				/>
+
 
 				{ results &&
 					<Result 
