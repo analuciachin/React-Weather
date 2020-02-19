@@ -50,6 +50,11 @@ li {
 	font-size: 60px;
 }
 
+.title-forecast {
+	letter-spacing: .10em;
+	font-size: 30px;
+}
+
 .btn {
 	padding: 10px;
 	text-decoration: uppercase;
@@ -147,6 +152,7 @@ li {
 .forecast-section {
 	margin: 100px auto;
 }
+
 .nav-link {
 	font-size: 18px;
 	font-weight: bold;

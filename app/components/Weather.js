@@ -205,7 +205,7 @@ function ForecastGrid({ weatherForecasts, getWeekDay, selectedDegree, updateDegr
 	//console.log(getWeekDay, selectedDegree)
 	return(
 		<div className='forecast-section'>
-			<h2>Forecast - 5 days</h2>
+			<h2 className='title-forecast'>Forecast - 5 days</h2>
 			<ul className='grid space-around'>
 				{weatherForecasts.map((forecast) => {
 					const { main, weather, dt_txt, dt} = forecast
