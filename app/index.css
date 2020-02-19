@@ -116,8 +116,12 @@ li {
 	font-size: 18px;
 }
 
-.forecast-temp {
-	font-size: 28px;
+.forecast-main-info {
+	font-size: 24px;
+}
+
+.forecast-detail-info {
+	font-size: 16px;
 }
 
 .grid {

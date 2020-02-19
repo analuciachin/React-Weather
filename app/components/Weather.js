@@ -121,6 +121,7 @@ class LocationInput extends React.Component {
 	}
 }
 
+
 class Forecast extends React.Component {
 
 	constructor(props) {
@@ -133,11 +134,15 @@ class Forecast extends React.Component {
 		}
 
 		this.getDayOfWeek = this.getDayOfWeek.bind(this)
+		this.toggleDegreeType = this.toggleDegreeType.bind(this)
 	}
 
 	componentDidMount() {
 		const API_KEY='c0e069a1e1238bcf2a556cf63b14a967'
-		const endpoint = window.encodeURI(`http://api.openweathermap.org/data/2.5/forecast?id=${this.props.city_id}&appid=${API_KEY}`)
+		//const endpoint = window.encodeURI(`http://api.openweathermap.org/data/2.5/forecast?id=${this.props.city_id}&appid=${API_KEY}`)
+
+		const endpoint = window.encodeURI(`http://api.openweathermap.org/data/2.5/forecast?units=metric&id=${this.props.city_id}&appid=${API_KEY}`)
+
 
 		fetch(endpoint)
 			.then(response => {
@@ -160,7 +165,6 @@ class Forecast extends React.Component {
 			})
 		}
 
-
 		getDayOfWeek(unixTimestamp) {
 			const dayWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 			let dayNum = new Date(unixTimestamp * 1000).getDay()
@@ -168,35 +172,58 @@ class Forecast extends React.Component {
 			return result
 		}
 
+
+		toggleDegreeType(selectedDegree, temp) {
+			if(this.props.selectedDegree === 'Celsius') {
+				console.log(this.props.selectedDegree, temp)
+				temp = (temp * 9/5) + 32
+			}
+			else {
+				console.log(this.props.selectedDegree, temp)
+				temp = (temp - 32) * 5/9
+			}
+			return temp
+		}
+
+
 		render() {
 			return(
 				<div>
-					{/*<p>{this.state.dailyData.length}</p>*/}
-					{/*<pre>{JSON.stringify(this.state.dailyData, null, 2)}</pre>*/}
-					<ForecastGrid weatherForecasts={this.state.dailyData} />
+					{/*<p>{this.state.dailyData.length}</p>
+					<pre>{JSON.stringify(this.state.dailyData, null, 2)}</pre>*/}
+					<ForecastGrid 
+						weatherForecasts={this.state.dailyData}
+						getWeekDay={this.getDayOfWeek}
+						selectedDegree={this.selectedDegree}
+						updateDegree={this.toggleDegreeType}
+					/>
 				</div>
 			)
 		}
 }
 
-function ForecastGrid({ weatherForecasts }) {
+function ForecastGrid({ weatherForecasts, getWeekDay, selectedDegree, updateDegree }) {
 	return(
 		<div className='forecast-section'>
 			<h2>Forecast - 5 days</h2>
 			<ul className='grid space-around'>
 				{weatherForecasts.map((forecast) => {
 					const { main, weather, dt_txt, dt} = forecast
-					const { temp, temp_min, temp_max } = main
+					const { temp } = main
 					const { description, icon } = weather[0]
 					return (
 						<li key={dt_txt}>
-							<p className='center-text'>{dt_txt}</p>
+							<p className='center-text forecast-main-info'>{getWeekDay(dt)}</p>
+							<p className='center-text forecast-detail-info'>{dt_txt}</p>
 							<img className='forecast-weather-icon'
 								src={`http://openweathermap.org/img/wn/${icon}@2x.png`} 
 								alt={`${description} icon`}
 							/>
-							<p className='center-text forecast-temp'>{(temp - 273.15).toFixed(0)}°C</p>
-							<p className='center-text'>{description}</p>
+							{	selectedDegree === 'Celsius'
+								? <p className='center-text forecast-main-info'>{updateDegree(selectedDegree,temp).toFixed(0)}°C</p>
+								: <p className='center-text forecast-main-info'>{updateDegree(selectedDegree,temp).toFixed(0)}°F</p>
+							}
+							<p className='center-text forecast-detail-info'>{description}</p>
 						</li>
 					)
 				})}
@@ -254,8 +281,8 @@ export default class Weather extends React.Component {
 				res_temp: data.main.temp - 273.15,
 				res_temp_min: data.main.temp_min - 273.15,
 				res_temp_max: data.main.temp_max - 273.15 ,
-				res_city_id:data.id
-			}))			
+				res_city_id: data.id
+			}))
 			.catch((error) => {
 				console.warn('Error fetching weather info: ', error)
 
@@ -267,7 +294,6 @@ export default class Weather extends React.Component {
 				})
 			})
 	}
-
 
 	handleError() {
 		if (this.state.error) {
@@ -332,7 +358,10 @@ export default class Weather extends React.Component {
 				}
 
 				{ results &&
-					<Forecast city_id={res_city_id}/>
+					<Forecast
+						city_id={res_city_id}
+						selectedDegree={selectedDegreeType}
+					/>
 				}
 
 				{ this.handleError() }
