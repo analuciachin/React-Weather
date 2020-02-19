@@ -317,7 +317,8 @@ export default class Weather extends React.Component {
 				res_temp: data.main.temp - 273.15,
 				res_temp_min: data.main.temp_min - 273.15,
 				res_temp_max: data.main.temp_max - 273.15 ,
-				res_city_id: data.id
+				res_city_id: data.id,
+				selectedDegreeType: 'Celsius'
 			}))
 			.catch((error) => {
 				console.warn('Error fetching weather info: ', error)
