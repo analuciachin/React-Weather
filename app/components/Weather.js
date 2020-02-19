@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 
 function DegreeTypeNav({ selected, onUpdateDegreeType }) {
@@ -18,7 +19,12 @@ function DegreeTypeNav({ selected, onUpdateDegreeType }) {
 			))}
 		</ul>
 	)
-}	
+}
+
+DegreeTypeNav.propTypes = {
+	selected: PropTypes.string.isRequired,
+	onUpdateDegreeType: PropTypes.func.isRequired
+}
 
 
 function Result({ degreeType, icon, weather, city, country, temp, temp_min, temp_max }) {
@@ -43,6 +49,16 @@ function Result({ degreeType, icon, weather, city, country, temp, temp_min, temp
 	)
 }
 
+Result.propTypes = {
+	degreeType: PropTypes.string.isRequired,
+	icon: PropTypes.string.isRequired,
+	weather: PropTypes.string.isRequired,
+	city: PropTypes.string.isRequired,
+	country: PropTypes.string.isRequired,
+	temp: PropTypes.string.isRequired,
+	temp_min: PropTypes.string.isRequired,
+	temp_max: PropTypes.string.isRequired
+}
 
 class LocationInput extends React.Component {
 	constructor(props) {
@@ -121,6 +137,9 @@ class LocationInput extends React.Component {
 	}
 }
 
+LocationInput.propTypes = {
+	onSubmit: PropTypes.func.isRequired
+}
 
 class Forecast extends React.Component {
 
@@ -201,6 +220,12 @@ class Forecast extends React.Component {
 		}
 }
 
+Forecast.propTypes = {
+	city_id: PropTypes.number.isRequired,
+	selectedDegree: PropTypes.string.isRequired
+}
+
+
 function ForecastGrid({ weatherForecasts, getWeekDay, selectedDegree, updateDegree }) {
 	//console.log(getWeekDay, selectedDegree)
 	return(
@@ -234,6 +259,13 @@ function ForecastGrid({ weatherForecasts, getWeekDay, selectedDegree, updateDegr
 			</ul>
 		</div>
 	)
+}
+
+ForecastGrid.propTypes = {
+	weatherForecasts: PropTypes.array.isRequired,
+	getWeekDay: PropTypes.func.isRequired,
+	selectedDegree: PropTypes.string.isRequired,
+	updateDegree: PropTypes.func.isRequired
 }
 
 
