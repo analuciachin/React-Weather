@@ -139,9 +139,7 @@ class Forecast extends React.Component {
 
 	componentDidMount() {
 		const API_KEY='c0e069a1e1238bcf2a556cf63b14a967'
-		//const endpoint = window.encodeURI(`http://api.openweathermap.org/data/2.5/forecast?id=${this.props.city_id}&appid=${API_KEY}`)
-
-		const endpoint = window.encodeURI(`http://api.openweathermap.org/data/2.5/forecast?units=metric&id=${this.props.city_id}&appid=${API_KEY}`)
+		const endpoint = window.encodeURI(`http://api.openweathermap.org/data/2.5/forecast?id=${this.props.city_id}&appid=${API_KEY}`)
 
 
 		fetch(endpoint)
@@ -175,12 +173,12 @@ class Forecast extends React.Component {
 
 		toggleDegreeType(selectedDegree, temp) {
 			if(this.props.selectedDegree === 'Celsius') {
-				console.log(this.props.selectedDegree, temp)
-				temp = (temp * 9/5) + 32
+				//console.log(this.props.selectedDegree, temp)
+				temp = temp - 273.15
 			}
 			else {
-				console.log(this.props.selectedDegree, temp)
-				temp = (temp - 32) * 5/9
+				//console.log(this.props.selectedDegree, temp)
+				temp = (temp - 273.15) * 9/5 + 32
 			}
 			return temp
 		}
@@ -191,11 +189,12 @@ class Forecast extends React.Component {
 				<div>
 					{/*<p>{this.state.dailyData.length}</p>
 					<pre>{JSON.stringify(this.state.dailyData, null, 2)}</pre>*/}
+					<p>{this.state.selectedDegree}</p>
 					<ForecastGrid 
 						weatherForecasts={this.state.dailyData}
 						getWeekDay={this.getDayOfWeek}
-						selectedDegree={this.selectedDegree}
 						updateDegree={this.toggleDegreeType}
+						selectedDegree={this.props.selectedDegree}
 					/>
 				</div>
 			)
@@ -203,6 +202,7 @@ class Forecast extends React.Component {
 }
 
 function ForecastGrid({ weatherForecasts, getWeekDay, selectedDegree, updateDegree }) {
+	//console.log(getWeekDay, selectedDegree)
 	return(
 		<div className='forecast-section'>
 			<h2>Forecast - 5 days</h2>
@@ -219,9 +219,13 @@ function ForecastGrid({ weatherForecasts, getWeekDay, selectedDegree, updateDegr
 								src={`http://openweathermap.org/img/wn/${icon}@2x.png`} 
 								alt={`${description} icon`}
 							/>
-							{	selectedDegree === 'Celsius'
-								? <p className='center-text forecast-main-info'>{updateDegree(selectedDegree,temp).toFixed(0)}°C</p>
-								: <p className='center-text forecast-main-info'>{updateDegree(selectedDegree,temp).toFixed(0)}°F</p>
+							{ selectedDegree === 'Celsius'
+								? <p className='center-text forecast-main-info'>
+										{updateDegree(selectedDegree,temp).toFixed(0)}°C
+									</p>
+								: <p className='center-text forecast-main-info'>
+										{updateDegree(selectedDegree,temp).toFixed(0)}°F
+									</p>
 							}
 							<p className='center-text forecast-detail-info'>{description}</p>
 						</li>
