@@ -25,6 +25,7 @@ li {
 .row {
 	display: flex;
 	flex-direction: row;
+	margin: 80px auto;
 }
 
 .input-light {
@@ -32,9 +33,9 @@ li {
 }
 
 .form-inputs {
-	width: 30%;
+	width: 35%;
   padding: 12px 20px;
-  margin: 8px 8px;
+  margin: auto;
   box-sizing: border-box;
   font-size: 16px;
 }
@@ -46,8 +47,12 @@ li {
 
 .title {
 	letter-spacing: .25em;
-	font-size: 40px;
-	margin: 0 auto 50px 20px;
+	font-size: 60px;
+}
+
+.title-forecast {
+	letter-spacing: .10em;
+	font-size: 30px;
 }
 
 .btn {
@@ -68,18 +73,18 @@ li {
 }
 
 .weather-result {
-	margin: 50px auto;
-	font-size: 20px;
+	margin: auto;
+	width: 50%;
 }
 
 .weather-result p {
 	letter-spacing: .10em;
 }
-/*
+
 .center-text {
 	text-align: center;
 }
-*/
+
 .error {
 	color: #ff1616;
 	font-size: 20px;
@@ -90,6 +95,67 @@ li {
 	color: #4d4d4d;
 }
 
-.weather-icon {
+.current-weather-icon {
+	margin: auto;
+	display: block;
+	width: 200px;
+	height: 200px;
+}
+
+.forecast-weather-icon {
 	margin: 10px 50px;
+	width: 100px;
+	height: 100px;
+}
+
+.current-title {
+	letter-spacing: .15em;
+	font-size: 40px;
+}
+
+.current-main-info {
+	font-size: 28px;
+}
+
+.current-detail-info {
+	font-size: 18px;
+}
+
+.forecast-main-info {
+	font-size: 24px;
+}
+
+.forecast-detail-info {
+	font-size: 16px;
+}
+
+.grid {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.space-around {
+	justify-content: space-around;
+}
+
+.flex-center {
+	display: flex;
+	justify-content: left;
+	align-items: center;
+}
+
+.btn-clear {
+	border: none;
+	background: transparent;
+}
+
+.forecast-section {
+	margin: 100px auto;
+}
+
+.nav-link {
+	font-size: 18px;
+	font-weight: bold;
+	text-decoration: none;
+	color: inherit;
 }
