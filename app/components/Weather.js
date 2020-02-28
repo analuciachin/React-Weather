@@ -158,7 +158,7 @@ class Forecast extends React.Component {
 
 	componentDidMount() {
 		const API_KEY='c0e069a1e1238bcf2a556cf63b14a967'
-		const endpoint = window.encodeURI(`http://api.openweathermap.org/data/2.5/forecast?id=${this.props.city_id}&appid=${API_KEY}`)
+		const endpoint = window.encodeURI(`https://api.openweathermap.org/data/2.5/forecast?id=${this.props.city_id}&appid=${API_KEY}`)
 
 
 		fetch(endpoint)
@@ -297,7 +297,7 @@ export default class Weather extends React.Component {
 		console.log(city, country)
 
 		const API_KEY='c0e069a1e1238bcf2a556cf63b14a967'
-		const endpoint = window.encodeURI(`http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&APPID=${API_KEY}`)
+		const endpoint = window.encodeURI(`https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&APPID=${API_KEY}`)
 
 		fetch(endpoint)
 			.then(response => {
