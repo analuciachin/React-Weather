@@ -141,90 +141,6 @@ LocationInput.propTypes = {
 	onSubmit: PropTypes.func.isRequired
 }
 
-class Forecast extends React.Component {
-
-	constructor(props) {
-		super(props)
-
-		this.state ={
-			fullData: [],
-			dailyData: [],
-			error: null
-		}
-
-		this.getDayOfWeek = this.getDayOfWeek.bind(this)
-		this.toggleDegreeType = this.toggleDegreeType.bind(this)
-	}
-
-	componentDidMount() {
-		const API_KEY='c0e069a1e1238bcf2a556cf63b14a967'
-		const endpoint = window.encodeURI(`https://api.openweathermap.org/data/2.5/forecast?id=${this.props.city_id}&appid=${API_KEY}`)
-
-
-		fetch(endpoint)
-			.then(response => {
-				if(!response.ok) {
-					throw new Error();
-				}
-				return response.json();
-			})
-			.then((data) => this.setState({ 
-				fullData: data.list,
-				dailyData: data.list.filter(reading => reading.dt_txt.includes("18:00:00")),
-				error: null
-			}))
-			.catch((error) => {
-				console.warn('Error fetching weather forecast info: ', error)
-
-				this.setState ({
-					error: `There was an error fetching the weather forecast info.`
-				})
-			})
-		}
-
-		getDayOfWeek(unixTimestamp) {
-			const dayWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-			let dayNum = new Date(unixTimestamp * 1000).getDay()
-			let result = dayWeek[dayNum]
-			return result
-		}
-
-
-		toggleDegreeType(selectedDegree, temp) {
-			if(this.props.selectedDegree === 'Celsius') {
-				//console.log(this.props.selectedDegree, temp)
-				temp = temp - 273.15
-			}
-			else {
-				//console.log(this.props.selectedDegree, temp)
-				temp = (temp - 273.15) * 9/5 + 32
-			}
-			return temp
-		}
-
-
-		render() {
-			return(
-				<div>
-					{/*<p>{this.state.dailyData.length}</p>
-					<pre>{JSON.stringify(this.state.dailyData, null, 2)}</pre>*/}
-					<p>{this.state.selectedDegree}</p>
-					<ForecastGrid 
-						weatherForecasts={this.state.dailyData}
-						getWeekDay={this.getDayOfWeek}
-						updateDegree={this.toggleDegreeType}
-						selectedDegree={this.props.selectedDegree}
-					/>
-				</div>
-			)
-		}
-}
-
-Forecast.propTypes = {
-	city_id: PropTypes.number.isRequired,
-	selectedDegree: PropTypes.string.isRequired
-}
-
 
 function ForecastGrid({ weatherForecasts, getWeekDay, selectedDegree, updateDegree }) {
 	//console.log(getWeekDay, selectedDegree)
@@ -286,11 +202,17 @@ export default class Weather extends React.Component {
 			res_temp_min: null,
 			res_temp_max: null,
 			res_icon: null,
-			res_city_id: null
+			res_city_id: null,
+			fullData: [],
+			dailyData: [],
+			forecast_error: null
 		}
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleError = this.handleError.bind(this)
 		this.updateDegreeType = this.updateDegreeType.bind(this)
+		this.getWeatherForecast = this.getWeatherForecast.bind(this)
+		this.getDayOfWeek = this.getDayOfWeek.bind(this)
+		this.toggleDegreeType = this.toggleDegreeType.bind(this)
 	}
 
 	handleSubmit(city, country) {
@@ -319,7 +241,10 @@ export default class Weather extends React.Component {
 				res_temp_max: data.main.temp_max - 273.15 ,
 				res_city_id: data.id,
 				selectedDegreeType: 'Celsius'
-			}))
+			}, ()=> { console.log(this.state.res_city_id)
+								this.getWeatherForecast()
+							}
+			))
 			.catch((error) => {
 				console.warn('Error fetching weather info: ', error)
 
@@ -331,6 +256,33 @@ export default class Weather extends React.Component {
 				})
 			})
 	}
+
+	getWeatherForecast() {
+		const API_KEY='c0e069a1e1238bcf2a556cf63b14a967'
+		const endpoint_forecast = window.encodeURI(`https://api.openweathermap.org/data/2.5/forecast?id=${this.state.res_city_id}&appid=${API_KEY}`)
+
+		console.log(endpoint_forecast)
+		fetch(endpoint_forecast)
+			.then(response => {
+				if(!response.ok) {
+					throw new Error();
+				}
+				return response.json();
+			})
+			.then((data) => this.setState({ 
+				fullData: data.list,
+				dailyData: data.list.filter(reading => reading.dt_txt.includes("18:00:00")),
+				forecast_error: null
+			}, () => console.log(this.state.dailyData)))
+			.catch((error) => {
+				console.warn('Error fetching weather forecast info: ', error)
+
+				this.setState ({
+					forecast_error: `There was an error fetching the weather forecast info.`
+				})
+			})
+	}
+
 
 	handleError() {
 		if (this.state.error) {
@@ -361,18 +313,39 @@ export default class Weather extends React.Component {
 	}
 
 
+	getDayOfWeek(unixTimestamp) {
+		const dayWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+		let dayNum = new Date(unixTimestamp * 1000).getDay()
+		let result = dayWeek[dayNum]
+		return result
+	}
+
+
+	toggleDegreeType(selectedDegree, temp) {
+		if(this.props.selectedDegree === 'Celsius') {
+			console.log(this.state.selectedDegreeType, temp)
+			temp = temp - 273.15
+		}
+		else {
+			console.log(this.state.selectedDegreeType, temp)
+			temp = (temp - 273.15) * 9/5 + 32
+		}
+		return temp
+	}
+
+
 	render() {
 		//console.log(this.props)
 		//onSubmit={(city, country) => console.log(city, country)}
 		//onSubmit={(city, country) => this.handleSubmit(city, country)}
 
-		const { selectedDegreeType, results, res_icon, res_weather, res_city, res_country, res_temp, res_temp_min, res_temp_max, res_city_id} = this.state
+		const { selectedDegreeType, results, res_icon, res_weather, res_city, res_country, res_temp, res_temp_min, res_temp_max, res_city_id, fullData, dailyData, forecast_error} = this.state
 
 		return (
 			<React.Fragment>
 				<h1 className='title center-text'>Weather Finder</h1>
 				<LocationInput
-					onSubmit={(city, country) => this.handleSubmit(city, country)}
+					onSubmit={(city, country) => {this.handleSubmit(city, country)}}
 				/>
 				{ results &&
 					<DegreeTypeNav 
@@ -393,16 +366,26 @@ export default class Weather extends React.Component {
 						temp_max={res_temp_max.toFixed(0)}
 					/>
 				}
-
+{/*
 				{ results &&
 					<Forecast
-						city_id={res_city_id}
+						forecastData={dailyData}
+						selectedDegree={selectedDegreeType}
+					/>
+				}
+*/}
+				{ results &&
+					<ForecastGrid
+						weatherForecasts={dailyData}
+						getWeekDay={this.getDayOfWeek}
+						updateDegree={this.toggleDegreeType}
 						selectedDegree={selectedDegreeType}
 					/>
 				}
 
 				{ this.handleError() }
 
+				
 				{/*<pre>{JSON.stringify(this.state.weatherData, null, 2)}</pre>*/}
 			
 			</React.Fragment>
