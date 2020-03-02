@@ -143,7 +143,7 @@ LocationInput.propTypes = {
 
 
 function ForecastGrid({ weatherForecasts, getWeekDay, selectedDegree, updateDegree }) {
-	//console.log(getWeekDay, selectedDegree)
+	console.log(selectedDegree, 'ForecastGrid')
 	return(
 		<div className='forecast-section'>
 			<h2 className='title-forecast'>Forecast - 5 days</h2>
@@ -216,7 +216,7 @@ export default class Weather extends React.Component {
 	}
 
 	handleSubmit(city, country) {
-		console.log(city, country)
+		//console.log(city, country)
 
 		const API_KEY='c0e069a1e1238bcf2a556cf63b14a967'
 		const endpoint = window.encodeURI(`https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&APPID=${API_KEY}`)
@@ -261,7 +261,7 @@ export default class Weather extends React.Component {
 		const API_KEY='c0e069a1e1238bcf2a556cf63b14a967'
 		const endpoint_forecast = window.encodeURI(`https://api.openweathermap.org/data/2.5/forecast?id=${this.state.res_city_id}&appid=${API_KEY}`)
 
-		console.log(endpoint_forecast)
+		//console.log(endpoint_forecast)
 		fetch(endpoint_forecast)
 			.then(response => {
 				if(!response.ok) {
@@ -322,12 +322,12 @@ export default class Weather extends React.Component {
 
 
 	toggleDegreeType(selectedDegree, temp) {
-		if(this.props.selectedDegree === 'Celsius') {
-			console.log(this.state.selectedDegreeType, temp)
+		if(selectedDegree === 'Celsius') {
+			console.log(this.state.selectedDegreeType, temp, 'here1')
 			temp = temp - 273.15
 		}
 		else {
-			console.log(this.state.selectedDegreeType, temp)
+			console.log(this.state.selectedDegreeType, temp, 'here3')
 			temp = (temp - 273.15) * 9/5 + 32
 		}
 		return temp
